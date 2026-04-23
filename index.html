@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>LooksMax Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  /* ── RESET & BASE ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:        #080808;
+    --surface:   #111115;
+    --card:      #161620;
+    --border:    rgba(255,255,255,0.06);
+    --cyan:      #00ffe7;
+    --purple:    #b44eff;
+    --pink:      #ff2d78;
+    --text:      #f0f0f0;
+    --muted:     #666;
+    --glow-c:    0 0 18px rgba(0,255,231,0.45);
+    --glow-p:    0 0 18px rgba(180,78,255,0.45);
+    --radius:    18px;
+    --nav-h:     72px;
+    --font-head: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-head);
+    overflow: hidden;
+  }
+
+  /* ── APP SHELL ── */
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  .app-header {
+    padding: 18px 22px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    background: linear-gradient(180deg, rgba(8,8,8,1) 70%, transparent);
+    position: relative;
+    z-index: 10;
+  }
+  .logo {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .logo span { -webkit-text-fill-color: var(--text); }
+  .header-badge {
+    font-size: 0.6rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--cyan);
+    border: 1px solid rgba(0,255,231,0.3);
+    padding: 3px 8px;
+    border-radius: 99px;
+    background: rgba(0,255,231,0.05);
+  }
+
+  /* ── PAGES ── */
+  .pages {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+  .page {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    padding: 10px 16px calc(var(--nav-h) + 16px);
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    scrollbar-width: none;
+  }
+  .page::-webkit-scrollbar { display: none; }
+  .page.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    background: rgba(14,14,20,0.92);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px 8px;
+    z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    flex: 1;
+    padding: 8px 4px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    font-family: var(--font-head);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: color 0.25s;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-btn svg { transition: transform 0.25s, filter 0.25s; }
+  .nav-btn.active { color: var(--cyan); }
+  .nav-btn.active svg { filter: drop-shadow(0 0 6px var(--cyan)); transform: translateY(-2px); }
+  .nav-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%; transform: translateX(-50%);
+    width: 0; height: 2px;
+    background: var(--cyan);
+    border-radius: 2px;
+    transition: width 0.25s;
+    box-shadow: var(--glow-c);
+  }
+  .nav-btn.active::after { width: 24px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,255,231,0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin-bottom: 6px;
+  }
+  .section-sub {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    margin-bottom: 20px;
+  }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    border: none;
+    border-radius: 14px;
+    color: #000;
+    font-family: var(--font-head);
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,255,231,0.25); }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    pointer-events: none;
+  }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    border: 1px solid rgba(0,255,231,0.3);
+    border-radius: 14px;
+    color: var(--cyan);
+    font-family: var(--font-head);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-secondary:hover { background: rgba(0,255,231,0.07); box-shadow: 0 0 20px rgba(0,255,231,0.1); }
+  .btn-secondary:active { transform: scale(0.97); }
+
+  /* ── UPLOAD ZONE ── */
+  .upload-zone {
+    border: 2px dashed rgba(0,255,231,0.25);
+    border-radius: 16px;
+    padding: 36px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    background: rgba(0,255,231,0.02);
+    margin-bottom: 14px;
+  }
+  .upload-zone:hover { border-color: rgba(0,255,231,0.5); background: rgba(0,255,231,0.05); }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 0 10px var(--cyan));
+  }
+  .upload-text { font-size: 0.9rem; color: var(--muted); }
+  .upload-text strong { color: var(--cyan); display: block; font-size: 1rem; margin-bottom: 4px; }
+  #preview-img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    display: none;
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── SCAN ANIMATION ── */
+  #scan-section { display: none; }
+  .scan-bar-wrap {
+    background: rgba(255,255,255,0.05);
+    border-radius: 99px;
+    height: 6px;
+    overflow: hidden;
+    margin: 14px 0 8px;
+  }
+  .scan-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    border-radius: 99px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px var(--cyan);
+  }
+  .scan-status {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--cyan);
+    letter-spacing: 0.05em;
+    min-height: 1.2em;
+  }
+  .scan-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    margin-bottom: 4px;
+  }
+
+  /* ── RESULTS ── */
+  #results-section { display: none; }
+  .score-ring-wrap {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  .score-ring {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+  }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring circle {
+    fill: none;
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+  .ring-bg { stroke: rgba(255,255,255,0.08); }
+  .ring-fill {
+    stroke: url(#ringGrad);
+    stroke-dasharray: 220;
+    stroke-dashoffset: 220;
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1);
+  }
+  .score-num {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--cyan);
+  }
+  .score-info h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; }
+  .score-info p { font-size: 0.78rem; color: var(--muted); font-family: var(--font-mono); }
+  .rating-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 99px;
+    margin-bottom: 10px;
+  }
+  .rating-tag.elite { background: rgba(0,255,231,0.1); color: var(--cyan); border: 1px solid rgba(0,255,231,0.3); }
+  .rating-tag.high  { background: rgba(180,78,255,0.1); color: var(--purple); border: 1px solid rgba(180,78,255,0.3); }
+  .rating-tag.mid   { background: rgba(255,180,0,0.1); color: #ffb400; border: 1px solid rgba(255,180,0,0.3); }
+  .rating-tag.low   { background: rgba(255,45,120,0.1); color: var(--pink); border: 1px solid rgba(255,45,120,0.3); }
+
+  /* ── TRAIT BARS ── */
+  .trait-row { margin-bottom: 12px; }
+  .trait-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .trait-name { font-size: 0.8rem; font-weight: 700; }
+  .trait-score { font-size: 0.75rem; font-family: var(--font-mono); color: var(--muted); }
+  .trait-bar { background: rgba(255,255,255,0.06); border-radius: 99px; height: 5px; overflow: hidden; }
+  .trait-fill {
+    height: 100%;
+    border-radius: 99px;
+    width: 0%;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  }
+  .trait-fill.c { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+  .trait-fill.p { background: var(--purple); box-shadow: 0 0 8px var(--purple); }
+  .trait-fill.k { background: var(--pink); box-shadow: 0 0 8px var(--pink); }
+
+  /* ── ROUTINE CHIPS ── */
+  .routine-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .chip {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 6px 13px;
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    color: var(--text);
+    letter-spacing: 0.02em;
+    transition: all 0.2s;
+  }
+  .chip.c { border-color: rgba(0,255,231,0.3); color: var(--cyan); background: rgba(0,255,231,0.05); }
+  .chip.p { border-color: rgba(180,78,255,0.3); color: var(--purple); background: rgba(180,78,255,0.05); }
+  .chip.k { border-color: rgba(255,45,120,0.3); color: var(--pink); background: rgba(255,45,120,0.05); }
+
+  /* ── WORKOUT ── */
+  .split-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .split-btn {
+    padding: 14px 10px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: var(--font-head);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .split-btn.active, .split-btn:hover {
+    border-color: rgba(180,78,255,0.5);
+    color: var(--purple);
+    background: rgba(180,78,255,0.07);
+    box-shadow: 0 0 20px rgba(180,78,255,0.1);
+  }
+  .split-btn.active { box-shadow: 0 0 20px rgba(180,78,255,0.2); }
+  .split-icon { font-size: 1.4rem; margin-bottom: 6px; display: block; }
+
+  /* ── ACCORDION ── */
+  .accordion-item {
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .accordion-item.open {
+    border-color: rgba(180,78,255,0.35);
+  }
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.02);
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .accordion-item.open .accordion-header {
+    background: rgba(180,78,255,0.06);
+    border-bottom: 1px solid rgba(180,78,255,0.2);
+  }
+  .accordion-day-badge {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 800; color: #fff;
+    flex-shrink: 0; letter-spacing: 0.03em;
+  }
+  .accordion-info { flex: 1; min-width: 0; }
+  .accordion-day-name {
+    font-size: 0.85rem; font-weight: 700;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .accordion-meta {
+    font-size: 0.67rem; font-family: var(--font-mono);
+    color: var(--muted); margin-top: 2px;
+  }
+  .accordion-chevron {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), color 0.2s;
+  }
+  .accordion-item.open .accordion-chevron {
+    transform: rotate(180deg);
+    color: var(--purple);
+  }
+  .accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .accordion-body-inner {
+    padding: 10px 10px 12px;
+  }
+
+  .exercise-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    animation: slideIn 0.3s ease both;
+  }
+  @keyframes slideIn {
+    from { opacity:0; transform: translateY(8px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  .ex-num {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 800;
+    color: #fff; flex-shrink: 0;
+  }
+  .ex-info { flex: 1; }
+  .ex-name { font-size: 0.88rem; font-weight: 700; margin-bottom: 2px; }
+  .ex-detail { font-size: 0.72rem; font-family: var(--font-mono); color: var(--muted); }
+  .ex-sets {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    color: var(--purple);
+    border: 1px solid rgba(180,78,255,0.3);
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: rgba(180,78,255,0.06);
+    white-space: nowrap;
+  }
+
+  /* ── ROUTINE PAGE ── */
+  .routine-time-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .time-icon {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .time-icon.morning { background: rgba(255,180,0,0.12); }
+  .time-icon.gym     { background: rgba(0,255,231,0.1); }
+  .time-icon.night   { background: rgba(180,78,255,0.1); }
+  .time-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-family: var(--font-mono); }
+  .time-label.morning { color: #ffb400; }
+  .time-label.gym     { color: var(--cyan); }
+  .time-label.night   { color: var(--purple); }
+
+  .habit-list { list-style: none; }
+  .habit-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    animation: slideIn 0.3s ease both;
+  }
+  .habit-item:last-child { border-bottom: none; }
+  .habit-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+  .habit-dot.c { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+  .habit-dot.p { background: var(--purple); box-shadow: 0 0 6px var(--purple); }
+  .habit-dot.k { background: var(--pink); box-shadow: 0 0 6px var(--pink); }
+  .habit-text { font-size: 0.83rem; line-height: 1.4; }
+  .habit-tag {
+    margin-left: auto;
+    font-size: 0.62rem;
+    font-family: var(--font-mono);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ── LOADING OVERLAY ── */
+  .loading-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    border-radius: var(--radius);
+  }
+  .loading-overlay.show { display: flex; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid rgba(0,255,231,0.2);
+    border-top-color: var(--cyan);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    box-shadow: 0 0 20px rgba(0,255,231,0.3);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 0.8rem; font-family: var(--font-mono); color: var(--cyan); letter-spacing: 0.05em; }
+
+  /* ── BG GLOW BLOBS ── */
+  .bg-blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob1 { width: 300px; height: 300px; background: rgba(0,255,231,0.03); top: -100px; right: -80px; }
+  .blob2 { width: 250px; height: 250px; background: rgba(180,78,255,0.04); bottom: 100px; left: -80px; }
+
+  /* ── MISC ── */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-family: var(--font-mono);
+  }
+  .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5; }
+
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+  .tag {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    padding: 3px 9px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* ── SHOPPING BTN ── */
+  .btn-shop {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(180,78,255,0.15), rgba(0,255,231,0.08));
+    border: 1px solid rgba(180,78,255,0.4);
+    border-radius: 14px;
+    color: var(--purple);
+    font-family: var(--font-head);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-shop:hover { background: rgba(180,78,255,0.18); box-shadow: 0 0 24px rgba(180,78,255,0.2); }
+  .btn-shop:active { transform: scale(0.97); }
+
+  /* ── MODAL BACKDROP ── */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.82);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 0 env(safe-area-inset-bottom, 0);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .modal-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px 24px 0 0;
+    padding: 28px 22px 36px;
+    width: 100%;
+    max-width: 480px;
+    transform: translateY(30px);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .modal-backdrop.open .modal-box { transform: translateY(0); }
+  .modal-icon { font-size: 2.2rem; margin-bottom: 12px; }
+  .modal-title { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 8px; }
+  .modal-body { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; font-family: var(--font-mono); }
+  .modal-warning {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    color: #ffb400;
+    background: rgba(255,180,0,0.08);
+    border: 1px solid rgba(255,180,0,0.2);
+    border-radius: 10px;
+    padding: 9px 12px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .modal-btns { display: flex; flex-direction: column; gap: 10px; }
+  .modal-btn-yes {
+    padding: 15px;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    border: none; border-radius: 14px;
+    color: #fff; font-family: var(--font-head);
+    font-size: 0.95rem; font-weight: 800;
+    cursor: pointer; transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .modal-btn-yes:active { transform: scale(0.97); }
+  .modal-btn-no {
+    padding: 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: var(--text); font-family: var(--font-head);
+    font-size: 0.9rem; font-weight: 700;
+    cursor: pointer; transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .modal-btn-no:hover { background: rgba(255,255,255,0.07); }
+  .modal-btn-no:active { transform: scale(0.97); }
+
+  /* ── SHOPPING MODAL ── */
+  .shop-modal-box {
+    padding: 22px 18px 36px;
+    max-height: 85dvh;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .shop-modal-box::-webkit-scrollbar { display: none; }
+  .shop-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .modal-close {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    color: var(--muted);
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 0.8rem;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .shop-category {
+    font-size: 0.62rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin: 16px 0 8px;
+    padding-left: 2px;
+  }
+  .shop-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    animation: slideIn 0.3s ease both;
+  }
+  .shop-emoji { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
+  .shop-info { flex: 1; min-width: 0; }
+  .shop-name { font-size: 0.85rem; font-weight: 700; margin-bottom: 3px; }
+  .shop-desc { font-size: 0.72rem; font-family: var(--font-mono); color: var(--muted); line-height: 1.4; margin-bottom: 4px; }
+  .shop-why {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    color: var(--cyan);
+    background: rgba(0,255,231,0.05);
+    border: 1px solid rgba(0,255,231,0.15);
+    border-radius: 6px;
+    padding: 3px 7px;
+    display: inline-block;
+  }
+  .shop-price {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--purple);
+    font-family: var(--font-mono);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .shop-total {
+    margin-top: 18px;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(180,78,255,0.1), rgba(0,255,231,0.06));
+    border: 1px solid rgba(180,78,255,0.3);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 800;
+    font-size: 0.95rem;
+  }
+  .shop-total-label { color: var(--muted); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 400; display: block; margin-top: 2px; }
+
+  .habit-supp-badge {
+    font-size: 0.6rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border-radius: 99px;
+    margin-left: 6px;
+    vertical-align: middle;
+    background: rgba(180,78,255,0.12);
+    color: var(--purple);
+    border: 1px solid rgba(180,78,255,0.25);
+  }
+
+  .ex-rest { font-size: 0.65rem; font-family: var(--font-mono); color: var(--muted); margin-top: 2px; }
+  #workout-split-label { font-size: 1.15rem; font-weight: 800; margin-bottom: 14px; line-height: 1.5; }
+  #workout-result, #routine-result { display: none; }
+</style>
+</head>
+<body>
+<div class="bg-blob blob1"></div>
+<div class="bg-blob blob2"></div>
+
+<div id="app">
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="logo">Looks<span>Max</span> Hub</div>
+    <div class="header-badge">BETA v2.4</div>
+  </header>
+
+  <!-- PAGES -->
+  <div class="pages">
+
+    <!-- PAGE 1: ANALYZER -->
+    <section class="page active" id="page-analyzer">
+      <h1 class="section-title">Face<br>Analyzer</h1>
+      <p class="section-sub">// AI-powered looksmax scoring</p>
+
+      <img id="preview-img" src="" alt="Preview" />
+
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" accept="image/*" id="file-input" />
+        <div class="upload-icon">📸</div>
+        <div class="upload-text">
+          <strong>Drop your photo here</strong>
+          tap to upload from camera roll
+        </div>
+      </div>
+
+      <!-- SCAN -->
+      <div class="card" id="scan-section">
+        <div class="scan-label">SCANNING FACIAL GEOMETRY</div>
+        <div class="scan-bar-wrap">
+          <div class="scan-bar-fill" id="scan-bar"></div>
+        </div>
+        <div class="scan-status" id="scan-status">Initializing…</div>
+      </div>
+
+      <!-- RESULTS -->
+      <div id="results-section">
+        <div class="card">
+          <svg width="0" height="0" style="position:absolute">
+            <defs>
+              <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#00ffe7"/>
+                <stop offset="100%" stop-color="#b44eff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="score-ring-wrap">
+            <div class="score-ring">
+              <svg viewBox="0 0 80 80" width="80" height="80">
+                <circle class="ring-bg" cx="40" cy="40" r="35" />
+                <circle class="ring-fill" id="ring-fill" cx="40" cy="40" r="35" />
+              </svg>
+              <div class="score-num" id="score-num">--</div>
+            </div>
+            <div class="score-info">
+              <div id="rating-tag" class="rating-tag elite">Elite Tier</div>
+              <h3 id="score-title">Calculating…</h3>
+              <p id="score-sub">Facial harmony index</p>
+            </div>
+          </div>
+
+          <div id="trait-list"></div>
+        </div>
+
+        <div class="card" id="routine-card">
+          <div style="font-size:0.7rem;font-family:var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;">
+            ⚡ Personalized Routine
+          </div>
+          <div id="looksmax-routine"></div>
+          <button class="btn-secondary" onclick="regenerateAnalyzer()">↻ Re-analyze</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 2: WORKOUT -->
+    <section class="page" id="page-workout">
+      <h1 class="section-title">Workout<br>Generator</h1>
+      <p class="section-sub">// Custom gym split builder</p>
+
+      <div style="font-size:0.7rem;font-family:var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Select Program Split</div>
+      <div class="split-selector">
+        <div class="split-btn active" data-split="ppl" onclick="selectSplit(this,'ppl')">
+          <span class="split-icon">🔁</span>PPL 6-Day
+        </div>
+        <div class="split-btn" data-split="arnold" onclick="selectSplit(this,'arnold')">
+          <span class="split-icon">🏆</span>Arnold Split
+        </div>
+        <div class="split-btn" data-split="upperlower" onclick="selectSplit(this,'upperlower')">
+          <span class="split-icon">⚖️</span>Upper/Lower
+        </div>
+        <div class="split-btn" data-split="bro" onclick="selectSplit(this,'bro')">
+          <span class="split-icon">💪</span>Bro Split
+        </div>
+        <div class="split-btn" data-split="fiveday" onclick="selectSplit(this,'fiveday')">
+          <span class="split-icon">📅</span>5-Day Split
+        </div>
+        <div class="split-btn" data-split="fullbody" onclick="selectSplit(this,'fullbody')">
+          <span class="split-icon">🔥</span>Full Body 3x
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="generateWorkout()">⚡ Generate Today's Session</button>
+
+      <div id="workout-result">
+        <div class="divider"></div>
+        <div class="card" style="position:relative;padding:14px 14px 6px;">
+          <div class="loading-overlay" id="workout-loader">
+            <div class="spinner"></div>
+            <div class="loading-text">Building your split…</div>
+          </div>
+          <div id="workout-split-header" style="margin-bottom:14px;">
+            <div style="font-size:0.65rem;font-family:var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Full Program</div>
+            <div id="workout-split-label"></div>
+          </div>
+          <div id="workout-accordion"></div>
+        </div>
+        <div class="tag-row" id="workout-tags"></div>
+        <button class="btn-secondary" onclick="generateWorkout()">↻ Generate Again</button>
+      </div>
+    </section>
+
+    <!-- PAGE 3: ROUTINES -->
+    <section class="page" id="page-routines">
+      <h1 class="section-title">Daily<br>Routines</h1>
+      <p class="section-sub">// TikTok-style looksmax protocol</p>
+
+      <button class="btn-primary" onclick="showSupplementModal()">✨ Generate My Routine</button>
+
+      <div id="routine-result">
+        <div class="divider"></div>
+        <div class="card" style="position:relative">
+          <div class="loading-overlay" id="routine-loader">
+            <div class="spinner"></div>
+            <div class="loading-text">Curating your stack…</div>
+          </div>
+
+          <div class="routine-time-block">
+            <div class="time-icon morning">🌅</div>
+            <div>
+              <div class="time-label morning">Morning Stack</div>
+              <div style="font-size:0.72rem;color:var(--muted);font-family:var(--font-mono)">6:00 AM – 8:00 AM</div>
+            </div>
+          </div>
+          <ul class="habit-list" id="morning-habits"></ul>
+
+          <div class="divider"></div>
+
+          <div class="routine-time-block">
+            <div class="time-icon gym">⚡</div>
+            <div>
+              <div class="time-label gym">Midday Grind</div>
+              <div style="font-size:0.72rem;color:var(--muted);font-family:var(--font-mono)">12:00 PM – 2:00 PM</div>
+            </div>
+          </div>
+          <ul class="habit-list" id="gym-habits"></ul>
+
+          <div class="divider"></div>
+
+          <div class="routine-time-block">
+            <div class="time-icon night">🌙</div>
+            <div>
+              <div class="time-label night">Night Protocol</div>
+              <div style="font-size:0.72rem;color:var(--muted);font-family:var(--font-mono)">9:00 PM – 11:00 PM</div>
+            </div>
+          </div>
+          <ul class="habit-list" id="night-habits"></ul>
+        </div>
+
+        <button class="btn-shop" onclick="showShoppingList()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          View Shopping List
+        </button>
+
+        <div class="tag-row" id="routine-tags"></div>
+        <button class="btn-secondary" onclick="showSupplementModal()">↻ Generate Again</button>
+      </div>
+    </section>
+
+    <!-- SUPPLEMENT MODAL -->
+    <div class="modal-backdrop" id="supp-modal" onclick="closeModalOutside(event)">
+      <div class="modal-box">
+        <div class="modal-icon">💊</div>
+        <div class="modal-title">Supplement Stack?</div>
+        <div class="modal-body">Do you want your routine to include supplements like fish oil, creatine, vitamins & more — or keep it to non-supplement habits only?</div>
+        <div class="modal-warning">⚠️ Always consult a doctor before starting any supplement regimen.</div>
+        <div class="modal-btns">
+          <button class="modal-btn-yes" onclick="startRoutine(true)">
+            💊 Yes, Include Supps
+          </button>
+          <button class="modal-btn-no" onclick="startRoutine(false)">
+            🚿 No Supplements
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHOPPING LIST MODAL -->
+    <div class="modal-backdrop" id="shop-modal" onclick="closeShopOutside(event)">
+      <div class="modal-box shop-modal-box">
+        <div class="shop-modal-header">
+          <div>
+            <div class="modal-title" style="margin-bottom:2px;">🛒 Shopping List</div>
+            <div style="font-size:0.7rem;font-family:var(--font-mono);color:var(--muted);">Everything you need to run this routine</div>
+          </div>
+          <button class="modal-close" onclick="document.getElementById('shop-modal').classList.remove('open')">✕</button>
+        </div>
+        <div id="shop-list-content"></div>
+        <div id="shop-total" class="shop-total"></div>
+      </div>
+    </div>
+
+  </div><!-- /pages -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchPage('analyzer',this)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        <path d="M11 8v6M8 11h6"/>
+      </svg>
+      Analyzer
+    </button>
+    <button class="nav-btn" onclick="switchPage('workout',this)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 4v16M18 4v16M2 8h4M18 8h4M2 16h4M18 16h4"/>
+      </svg>
+      Workout
+    </button>
+    <button class="nav-btn" onclick="switchPage('routines',this)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+      </svg>
+      Routines
+    </button>
+  </nav>
+</div>
+
+<script>
+/* ═══════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════ */
+function switchPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ═══════════════════════════════════
+   DATA BANKS
+═══════════════════════════════════ */
+const scanSteps = [
+  'Mapping facial landmarks…',
+  'Analyzing bone structure…',
+  'Measuring canthal tilt…',
+  'Calculating jawline angularity…',
+  'Checking facial thirds…',
+  'Evaluating skin texture…',
+  'Symmetry cross-referencing…',
+  'Comparing to golden ratio…',
+  'Computing final score…',
+  'Done ✓'
+];
+
+const traits = [
+  { name: 'Jawline Definition', col: 'c' },
+  { name: 'Facial Symmetry',   col: 'p' },
+  { name: 'Canthal Tilt',      col: 'k' },
+  { name: 'Skin Clarity',      col: 'c' },
+  { name: 'Bone Structure',    col: 'p' },
+];
+
+const ratings = [
+  { label: 'Elite Tier', cls: 'elite', title: 'Top 1% Genetics', sub: 'Exceptional facial harmony' },
+  { label: 'High Tier',  cls: 'high',  title: 'Above Average',   sub: 'Strong facial structure' },
+  { label: 'Mid Tier',   cls: 'mid',   title: 'Average Range',   sub: 'Looksmaxxing will help' },
+  { label: 'Ascending',  cls: 'low',   title: 'Glow-Up Potential', sub: 'Huge room to improve' },
+];
+
+const looksmaxRoutines = [
+  ['Mewing tongue posture', 'Bone smashing jaw (light)', 'Tretinoin 0.05% nightly', 'Hyaluronic acid serum'],
+  ['Facial yoga 10 min/day', 'Gua sha lymph drainage', 'SPF 50 every morning', 'Collagen peptides supplement'],
+  ['Cold shower face rinse', 'Niacinamide 10% serum', 'Jaw exerciser 5min/day', 'Retinol + Vitamin C stack'],
+  ['Under-eye collagen patches', 'Derma roller 0.25mm 2x/wk', 'Sleep on silk pillowcase', 'Red light therapy 10min'],
+  ['Vitamin D3 + K2 stack', 'Zinc for skin clarity', 'Intermittent fasting 16:8', 'Posture chin tuck drills'],
+  ['Face tape for jawline lift', 'Peptide eye cream nightly', 'Protein 180g+/day', 'Hair oiling treatment'],
+];
+
+// Each split has multiple "days" — we randomly pick one per generate
+const workoutData = {
+  ppl: {
+    label: '🔁 PPL 6-Day',
+    info: 'Push · Pull · Legs × 2/week',
+    days: [
+      {
+        day: 'Push A — Chest Focus',
+        exercises: [
+          { name: 'Flat Barbell Bench Press',    detail: 'Compound • Chest primary',        sets: '5×5',    rest: '3 min' },
+          { name: 'Incline DB Press',            detail: 'Compound • Upper chest',           sets: '4×8-10', rest: '2 min' },
+          { name: 'Cable Chest Fly (Low)',       detail: 'Isolation • Upper pec stretch',    sets: '4×12',   rest: '90s'  },
+          { name: 'Overhead Barbell Press',      detail: 'Compound • Front & side delts',    sets: '4×8',    rest: '2 min' },
+          { name: 'Seated DB Lateral Raise',     detail: 'Isolation • Side delts',           sets: '4×15-20',rest: '60s'  },
+          { name: 'Cable Lateral Raise',         detail: 'Isolation • Constant tension',     sets: '3×15',   rest: '60s'  },
+          { name: 'Tricep Rope Pushdown',        detail: 'Isolation • Lateral head',         sets: '4×12-15',rest: '60s'  },
+          { name: 'Overhead DB Tricep Ext.',     detail: 'Isolation • Long head stretch',    sets: '3×12',   rest: '75s'  },
+          { name: 'Decline Push-Ups (burnout)',  detail: 'Finisher • Chest pump',            sets: '2×fail', rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Pull A — Back Width Focus',
+        exercises: [
+          { name: 'Weighted Pull-Ups',           detail: 'Compound • Lat width',             sets: '5×6-8',  rest: '3 min' },
+          { name: 'Barbell Bent-Over Row',       detail: 'Compound • Mid back thickness',    sets: '4×8',    rest: '2 min' },
+          { name: 'Chest-Supported DB Row',      detail: 'Compound • Strict form',           sets: '4×10',   rest: '90s'  },
+          { name: 'Lat Pulldown (Wide Grip)',    detail: 'Compound • Lat stretch',           sets: '4×10-12',rest: '90s'  },
+          { name: 'Seated Cable Row (V-Bar)',    detail: 'Compound • Mid back squeeze',      sets: '3×12',   rest: '90s'  },
+          { name: 'Face Pulls',                  detail: 'Isolation • Rear delts & health',  sets: '4×20-25',rest: '60s'  },
+          { name: 'DB Bicep Curl',               detail: 'Isolation • Full ROM',             sets: '4×12',   rest: '75s'  },
+          { name: 'Incline DB Curl',             detail: 'Isolation • Long head stretch',    sets: '3×12',   rest: '60s'  },
+          { name: 'Hammer Curls',                detail: 'Isolation • Brachialis',           sets: '3×12',   rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Legs A — Quad Focus',
+        exercises: [
+          { name: 'Barbell Back Squat',          detail: 'King lift • Quads & glutes',       sets: '5×5',    rest: '3 min' },
+          { name: 'Hack Squat',                  detail: 'Compound • Quad isolator',         sets: '4×10-12',rest: '2 min' },
+          { name: 'Leg Press (High Foot)',       detail: 'Compound • Glute emphasis',        sets: '4×12-15',rest: '2 min' },
+          { name: 'Bulgarian Split Squat',       detail: 'Unilateral • Balance & strength',  sets: '3×10 ea',rest: '90s'  },
+          { name: 'Leg Extension',               detail: 'Isolation • Quad definition',      sets: '4×15-20',rest: '60s'  },
+          { name: 'Romanian Deadlift',           detail: 'Compound • Hamstring stretch',     sets: '4×10',   rest: '90s'  },
+          { name: 'Lying Leg Curl',              detail: 'Isolation • Hamstring curl',       sets: '4×12',   rest: '60s'  },
+          { name: 'Standing Calf Raise',         detail: 'Isolation • Gastrocnemius',        sets: '5×20',   rest: '45s'  },
+          { name: 'Seated Calf Raise',           detail: 'Isolation • Soleus',               sets: '4×20',   rest: '45s'  },
+        ]
+      },
+      {
+        day: 'Push B — Shoulder Focus',
+        exercises: [
+          { name: 'Seated DB Shoulder Press',    detail: 'Compound • Front & side delts',    sets: '5×8',    rest: '2 min' },
+          { name: 'Arnold Press',                detail: 'Compound • All three delt heads',  sets: '4×10',   rest: '90s'  },
+          { name: 'Incline Barbell Bench Press', detail: 'Compound • Upper chest strength',  sets: '4×8',    rest: '2 min' },
+          { name: 'DB Lateral Raise',            detail: 'Isolation • Side delt width',      sets: '5×15-20',rest: '60s'  },
+          { name: 'Cable Lateral Raise',         detail: 'Isolation • Constant tension',     sets: '3×15',   rest: '60s'  },
+          { name: 'Cable Chest Fly (High)',      detail: 'Isolation • Lower pec cross',      sets: '4×12',   rest: '75s'  },
+          { name: 'Close-Grip Bench Press',      detail: 'Compound • Tricep strength',       sets: '4×8-10', rest: '90s'  },
+          { name: 'Tricep Dips (Weighted)',      detail: 'Compound • All three heads',       sets: '3×10',   rest: '90s'  },
+          { name: 'Single-Arm Pushdown',         detail: 'Isolation • Lateral head pump',    sets: '3×15 ea',rest: '45s'  },
+        ]
+      },
+      {
+        day: 'Pull B — Back Thickness Focus',
+        exercises: [
+          { name: 'Deadlift',                    detail: 'King lift • Full posterior chain',  sets: '4×5',    rest: '4 min' },
+          { name: 'T-Bar Row',                   detail: 'Compound • Mid back thickness',    sets: '4×10',   rest: '2 min' },
+          { name: 'Single-Arm DB Row',           detail: 'Unilateral • Full ROM',            sets: '4×10 ea',rest: '90s'  },
+          { name: 'Lat Pulldown (Close Grip)',   detail: 'Compound • Lower lat emphasis',    sets: '4×12',   rest: '90s'  },
+          { name: 'Straight-Arm Cable Pulldown', detail: 'Isolation • Lat activation',       sets: '3×15',   rest: '60s'  },
+          { name: 'Rear Delt Fly (Pec Deck)',    detail: 'Isolation • Rear delt & health',   sets: '4×15-20',rest: '60s'  },
+          { name: 'EZ-Bar Curl',                 detail: 'Compound • Bicep mass',            sets: '4×10',   rest: '75s'  },
+          { name: 'Cable Curl',                  detail: 'Isolation • Peak contraction',     sets: '3×12',   rest: '60s'  },
+          { name: 'Reverse Curl',                detail: 'Isolation • Brachioradialis',      sets: '3×12',   rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Legs B — Hamstring & Glute Focus',
+        exercises: [
+          { name: 'Romanian Deadlift',           detail: 'Compound • Hamstring dominant',    sets: '5×8',    rest: '3 min' },
+          { name: 'Sumo Squat',                  detail: 'Compound • Inner quad & glute',    sets: '4×10',   rest: '2 min' },
+          { name: 'Leg Curl (Seated)',            detail: 'Isolation • Hamstring peak',       sets: '4×12',   rest: '75s'  },
+          { name: 'Lying Leg Curl',              detail: 'Isolation • Short head ham.',      sets: '4×12',   rest: '75s'  },
+          { name: 'Hip Thrust (Barbell)',         detail: 'Isolation • Glute max peak',       sets: '5×12',   rest: '90s'  },
+          { name: 'Cable Pull-Through',          detail: 'Compound • Hip hinge pattern',     sets: '3×15',   rest: '60s'  },
+          { name: 'Leg Press (Narrow Foot)',     detail: 'Compound • Quad emphasis',         sets: '4×15',   rest: '90s'  },
+          { name: 'Leg Extension',               detail: 'Isolation • VMO definition',       sets: '3×20',   rest: '45s'  },
+          { name: 'Seated Calf Raise',           detail: 'Isolation • Soleus strength',      sets: '5×20',   rest: '45s'  },
+        ]
+      },
+    ]
+  },
+
+  arnold: {
+    label: '🏆 Arnold Split',
+    info: 'Chest+Back / Shoulders+Arms / Legs — 6 days',
+    days: [
+      {
+        day: 'Chest & Back',
+        exercises: [
+          { name: 'Flat Barbell Bench Press',    detail: 'Compound • Chest strength',        sets: '5×6-8',  rest: '3 min' },
+          { name: 'Weighted Pull-Ups',           detail: 'Compound • Lat width',             sets: '5×6-8',  rest: '3 min' },
+          { name: 'Incline DB Press',            detail: 'Compound • Upper chest',           sets: '4×10',   rest: '2 min' },
+          { name: 'Bent-Over Barbell Row',       detail: 'Compound • Back thickness',        sets: '4×8',    rest: '2 min' },
+          { name: 'Cable Chest Fly',             detail: 'Isolation • Pec squeeze',          sets: '3×12',   rest: '75s'  },
+          { name: 'Seated Cable Row',            detail: 'Isolation • Mid back',             sets: '3×12',   rest: '90s'  },
+          { name: 'Dumbbell Pullover',           detail: 'Hybrid • Chest & lat stretch',     sets: '3×12',   rest: '75s'  },
+          { name: 'Chest-Supported Row',         detail: 'Compound • Strict pull',           sets: '3×12',   rest: '75s'  },
+          { name: 'Push-Up (wide grip)',         detail: 'Finisher • Chest pump',            sets: '2×fail', rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Shoulders & Arms',
+        exercises: [
+          { name: 'Overhead Barbell Press',      detail: 'Compound • Shoulder mass',         sets: '5×6-8',  rest: '3 min' },
+          { name: 'DB Lateral Raise',            detail: 'Isolation • Side delt width',      sets: '5×15-20',rest: '60s'  },
+          { name: 'Front Raise (Plate)',         detail: 'Isolation • Front delt',           sets: '3×12',   rest: '60s'  },
+          { name: 'Barbell Curl',                detail: 'Compound • Bicep mass',            sets: '4×10',   rest: '90s'  },
+          { name: 'Close-Grip Bench Press',      detail: 'Compound • Tricep strength',       sets: '4×8',    rest: '90s'  },
+          { name: 'Incline DB Curl',             detail: 'Isolation • Long head stretch',    sets: '3×12',   rest: '60s'  },
+          { name: 'Skull Crushers (EZ-Bar)',     detail: 'Isolation • Tricep long head',     sets: '4×10',   rest: '75s'  },
+          { name: 'Cable Curl',                  detail: 'Isolation • Peak contraction',     sets: '3×15',   rest: '45s'  },
+          { name: 'Tricep Rope Pushdown',        detail: 'Isolation • Lateral head',         sets: '3×15',   rest: '45s'  },
+          { name: 'Reverse Curl',                detail: 'Isolation • Forearm & brachialis', sets: '3×12',   rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Legs (Arnold Style)',
+        exercises: [
+          { name: 'Barbell Back Squat',          detail: 'King lift • Overall leg mass',     sets: '6×6-10', rest: '3 min' },
+          { name: 'Leg Press',                   detail: 'Compound • Volume builder',        sets: '5×15',   rest: '2 min' },
+          { name: 'Hack Squat',                  detail: 'Compound • Quad sweep',            sets: '4×12',   rest: '90s'  },
+          { name: 'Leg Extension',               detail: 'Isolation • Quad definition',      sets: '4×15-20',rest: '60s'  },
+          { name: 'Romanian Deadlift',           detail: 'Compound • Hamstring length',      sets: '4×10',   rest: '2 min' },
+          { name: 'Lying Leg Curl',              detail: 'Isolation • Ham curl',             sets: '4×12',   rest: '75s'  },
+          { name: 'Hip Thrust',                  detail: 'Isolation • Glute peak',           sets: '4×15',   rest: '90s'  },
+          { name: 'Standing Calf Raise',         detail: 'Isolation • Gastroc',              sets: '6×20',   rest: '45s'  },
+          { name: 'Donkey Calf Raise',           detail: 'Isolation • Full stretch',         sets: '4×20',   rest: '45s'  },
+        ]
+      },
+    ]
+  },
+
+  upperlower: {
+    label: '⚖️ Upper / Lower',
+    info: 'Upper A · Lower A · Upper B · Lower B',
+    days: [
+      {
+        day: 'Upper A — Strength Focus',
+        exercises: [
+          { name: 'Barbell Bench Press',         detail: 'Compound • Horizontal push',       sets: '4×5',    rest: '3 min' },
+          { name: 'Bent-Over Row',               detail: 'Compound • Horizontal pull',       sets: '4×5',    rest: '3 min' },
+          { name: 'Overhead Press',              detail: 'Compound • Vertical push',         sets: '3×8',    rest: '2 min' },
+          { name: 'Weighted Pull-Ups',           detail: 'Compound • Vertical pull',         sets: '3×6-8',  rest: '2 min' },
+          { name: 'Incline DB Press',            detail: 'Compound • Upper chest accessory', sets: '3×10',   rest: '90s'  },
+          { name: 'Cable Row (Wide Grip)',        detail: 'Compound • Upper back width',      sets: '3×12',   rest: '90s'  },
+          { name: 'DB Lateral Raise',            detail: 'Isolation • Delt accessory',       sets: '3×15',   rest: '60s'  },
+          { name: 'EZ-Bar Curl',                 detail: 'Isolation • Bicep accessory',      sets: '3×10',   rest: '60s'  },
+          { name: 'Skull Crushers',              detail: 'Isolation • Tricep accessory',     sets: '3×10',   rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Lower A — Squat Focus',
+        exercises: [
+          { name: 'Barbell Back Squat',          detail: 'King lift • Full leg development', sets: '4×5',    rest: '4 min' },
+          { name: 'Romanian Deadlift',           detail: 'Compound • Posterior chain',       sets: '3×8',    rest: '2 min' },
+          { name: 'Leg Press',                   detail: 'Compound • Volume quad work',      sets: '3×12',   rest: '2 min' },
+          { name: 'Bulgarian Split Squat',       detail: 'Unilateral • Leg balance',         sets: '3×10 ea',rest: '90s'  },
+          { name: 'Leg Curl (Seated)',            detail: 'Isolation • Hamstring',            sets: '3×12',   rest: '60s'  },
+          { name: 'Leg Extension',               detail: 'Isolation • Quad finisher',        sets: '3×15',   rest: '60s'  },
+          { name: 'Hip Thrust',                  detail: 'Isolation • Glute activation',     sets: '3×15',   rest: '75s'  },
+          { name: 'Standing Calf Raise',         detail: 'Isolation • Gastroc strength',     sets: '4×20',   rest: '45s'  },
+          { name: 'Ab Wheel Rollout',            detail: 'Core • Anti-extension',            sets: '3×10',   rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Upper B — Hypertrophy Focus',
+        exercises: [
+          { name: 'Incline Barbell Bench Press', detail: 'Compound • Upper chest emphasis',  sets: '4×10',   rest: '2 min' },
+          { name: 'Lat Pulldown (Wide Grip)',    detail: 'Compound • Lat width',             sets: '4×10',   rest: '90s'  },
+          { name: 'Seated DB Press',             detail: 'Compound • Shoulder hypertrophy',  sets: '4×10',   rest: '90s'  },
+          { name: 'DB Row',                      detail: 'Compound • Mid back density',      sets: '4×12',   rest: '90s'  },
+          { name: 'Cable Chest Fly',             detail: 'Isolation • Pec stretch',          sets: '4×12',   rest: '75s'  },
+          { name: 'Face Pulls',                  detail: 'Isolation • Rear delt health',     sets: '4×20',   rest: '60s'  },
+          { name: 'Lateral Raise (Cable)',       detail: 'Isolation • Side delt pump',       sets: '4×15',   rest: '60s'  },
+          { name: 'Incline DB Curl',             detail: 'Isolation • Bicep long head',      sets: '3×12',   rest: '60s'  },
+          { name: 'Overhead Tricep Ext.',        detail: 'Isolation • Tricep long head',     sets: '3×12',   rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Lower B — Deadlift Focus',
+        exercises: [
+          { name: 'Conventional Deadlift',       detail: 'King lift • Posterior chain',      sets: '4×5',    rest: '4 min' },
+          { name: 'Front Squat',                 detail: 'Compound • Quad dominant',         sets: '3×8',    rest: '2 min' },
+          { name: 'Leg Press (Narrow Stance)',   detail: 'Compound • Quad emphasis',         sets: '3×15',   rest: '90s'  },
+          { name: 'Nordic Hamstring Curl',       detail: 'Compound • Eccentric ham strength', sets: '3×6',   rest: '2 min' },
+          { name: 'Hip Thrust (Barbell)',         detail: 'Isolation • Glute max',            sets: '4×12',   rest: '90s'  },
+          { name: 'Goblet Squat (Tempo)',        detail: 'Compound • 3-1-3 tempo',           sets: '3×12',   rest: '75s'  },
+          { name: 'Seated Calf Raise',           detail: 'Isolation • Soleus focus',         sets: '4×20',   rest: '45s'  },
+          { name: 'Cable Pull-Through',          detail: 'Compound • Hip hinge pattern',     sets: '3×15',   rest: '60s'  },
+          { name: 'Hanging Leg Raise',           detail: 'Core • Hip flexor & abs',          sets: '3×12',   rest: '60s'  },
+        ]
+      },
+    ]
+  },
+
+  bro: {
+    label: '💪 Bro Split',
+    info: 'Chest / Back / Shoulders / Arms / Legs',
+    days: [
+      {
+        day: 'Chest Day',
+        exercises: [
+          { name: 'Flat Barbell Bench Press',    detail: 'Compound • Mass builder',          sets: '5×5',    rest: '3 min' },
+          { name: 'Incline DB Press',            detail: 'Compound • Upper chest',           sets: '4×10',   rest: '2 min' },
+          { name: 'Decline Barbell Press',       detail: 'Compound • Lower chest',           sets: '4×10',   rest: '90s'  },
+          { name: 'Cable Fly (Mid)',             detail: 'Isolation • Inner pec squeeze',    sets: '4×12',   rest: '75s'  },
+          { name: 'Incline Cable Fly',           detail: 'Isolation • Upper pec cross',      sets: '3×15',   rest: '60s'  },
+          { name: 'Dumbbell Pullover',           detail: 'Hybrid • Chest & serratus',        sets: '3×12',   rest: '75s'  },
+          { name: 'Machine Chest Press',         detail: 'Compound • Controlled pump',       sets: '3×15',   rest: '60s'  },
+          { name: 'Push-Up (weighted)',          detail: 'Finisher • Total failure',         sets: '2×fail', rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Back Day',
+        exercises: [
+          { name: 'Deadlift',                    detail: 'Compound • King of all lifts',     sets: '4×5',    rest: '4 min' },
+          { name: 'Barbell Bent-Over Row',       detail: 'Compound • Mid back thickness',   sets: '4×8',    rest: '2 min' },
+          { name: 'Wide-Grip Pull-Up',           detail: 'Compound • Lat width',             sets: '4×8',    rest: '2 min' },
+          { name: 'Seated Cable Row (Wide)',     detail: 'Compound • Upper back',            sets: '4×12',   rest: '90s'  },
+          { name: 'T-Bar Row',                   detail: 'Compound • Depth builder',         sets: '4×10',   rest: '90s'  },
+          { name: 'Lat Pulldown (V-Bar)',        detail: 'Isolation • Lower lat emphasis',   sets: '3×12',   rest: '75s'  },
+          { name: 'DB Shrug',                    detail: 'Isolation • Trapezius',            sets: '4×15',   rest: '60s'  },
+          { name: 'Rack Pull',                   detail: 'Partial • Upper back overload',    sets: '3×6',    rest: '3 min' },
+        ]
+      },
+      {
+        day: 'Shoulder Day',
+        exercises: [
+          { name: 'Overhead Barbell Press',      detail: 'Compound • Front & side delt',     sets: '5×5',    rest: '3 min' },
+          { name: 'Seated Arnold Press',         detail: 'Compound • All three heads',       sets: '4×10',   rest: '2 min' },
+          { name: 'DB Lateral Raise',            detail: 'Isolation • Side delt width',      sets: '5×15-20',rest: '60s'  },
+          { name: 'Cable Lateral Raise',         detail: 'Isolation • Side delt pump',       sets: '4×15',   rest: '60s'  },
+          { name: 'Bent-Over Rear Delt Fly',     detail: 'Isolation • Rear delts',           sets: '4×15',   rest: '60s'  },
+          { name: 'Face Pulls',                  detail: 'Isolation • Rear delt & health',   sets: '4×20',   rest: '60s'  },
+          { name: 'Front Raise (DB)',            detail: 'Isolation • Front delt',           sets: '3×12',   rest: '60s'  },
+          { name: 'Upright Row',                 detail: 'Compound • Side delt & trap',      sets: '3×12',   rest: '75s'  },
+        ]
+      },
+      {
+        day: 'Arms Day',
+        exercises: [
+          { name: 'Barbell Curl',                detail: 'Compound • Bicep mass',            sets: '5×8',    rest: '2 min' },
+          { name: 'Close-Grip Bench Press',      detail: 'Compound • Tricep strength',       sets: '5×8',    rest: '2 min' },
+          { name: 'Incline DB Curl',             detail: 'Isolation • Long head stretch',    sets: '4×12',   rest: '75s'  },
+          { name: 'Skull Crushers (EZ-Bar)',     detail: 'Isolation • Long head mass',       sets: '4×10',   rest: '75s'  },
+          { name: 'Concentration Curl',          detail: 'Isolation • Bicep peak',           sets: '3×12',   rest: '60s'  },
+          { name: 'Rope Pushdown',               detail: 'Isolation • Lateral head',         sets: '4×15',   rest: '60s'  },
+          { name: 'Cable Curl (Low)',            detail: 'Isolation • Peak contraction',     sets: '3×15',   rest: '60s'  },
+          { name: 'Overhead Tricep Ext.',        detail: 'Isolation • Long head stretch',    sets: '3×12',   rest: '60s'  },
+          { name: 'Hammer Curl',                 detail: 'Isolation • Brachialis',           sets: '3×12',   rest: '60s'  },
+          { name: 'Reverse Pushdown',            detail: 'Isolation • Forearm & tricep',     sets: '3×15',   rest: '45s'  },
+        ]
+      },
+      {
+        day: 'Leg Day',
+        exercises: [
+          { name: 'Barbell Back Squat',          detail: 'King lift • Total leg mass',       sets: '5×5',    rest: '4 min' },
+          { name: 'Leg Press',                   detail: 'Compound • Volume builder',        sets: '5×15',   rest: '2 min' },
+          { name: 'Hack Squat',                  detail: 'Compound • Quad sweep',            sets: '4×12',   rest: '2 min' },
+          { name: 'Bulgarian Split Squat',       detail: 'Unilateral • Leg symmetry',        sets: '3×12 ea',rest: '90s'  },
+          { name: 'Leg Extension',               detail: 'Isolation • Quad definition',      sets: '4×20',   rest: '60s'  },
+          { name: 'Romanian Deadlift',           detail: 'Compound • Hamstring length',      sets: '4×10',   rest: '2 min' },
+          { name: 'Lying Leg Curl',              detail: 'Isolation • Hamstring curl',       sets: '4×12',   rest: '75s'  },
+          { name: 'Hip Thrust (Barbell)',         detail: 'Isolation • Glute max peak',       sets: '5×12',   rest: '90s'  },
+          { name: 'Standing Calf Raise',         detail: 'Isolation • Gastroc mass',         sets: '6×20',   rest: '45s'  },
+        ]
+      },
+    ]
+  },
+
+  fiveday: {
+    label: '📅 5-Day Physique Split',
+    info: 'Chest / Back / Shoulders / Arms / Legs',
+    days: [
+      {
+        day: 'Day 1 — Chest & Triceps',
+        exercises: [
+          { name: 'Flat Barbell Bench Press',    detail: 'Compound • Primary mass',          sets: '4×8',    rest: '3 min' },
+          { name: 'Incline DB Press',            detail: 'Compound • Upper chest',           sets: '4×10',   rest: '2 min' },
+          { name: 'Cable Chest Fly (High)',      detail: 'Isolation • Lower pec cross',      sets: '3×12',   rest: '75s'  },
+          { name: 'Cable Chest Fly (Low)',       detail: 'Isolation • Upper pec cross',      sets: '3×12',   rest: '75s'  },
+          { name: 'Machine Chest Press',         detail: 'Compound • Pump finisher',         sets: '3×15',   rest: '60s'  },
+          { name: 'Skull Crushers',              detail: 'Isolation • Tricep long head',     sets: '4×10',   rest: '75s'  },
+          { name: 'Tricep Rope Pushdown',        detail: 'Isolation • Lateral head',         sets: '4×15',   rest: '60s'  },
+          { name: 'Overhead Tricep Ext. (DB)',   detail: 'Isolation • Long head stretch',    sets: '3×12',   rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Day 2 — Back & Biceps',
+        exercises: [
+          { name: 'Weighted Pull-Ups',           detail: 'Compound • Lat width priority',    sets: '4×8',    rest: '3 min' },
+          { name: 'Barbell Bent-Over Row',       detail: 'Compound • Back thickness',        sets: '4×8',    rest: '2 min' },
+          { name: 'Lat Pulldown (Wide)',         detail: 'Compound • Lat sweep',             sets: '4×10',   rest: '90s'  },
+          { name: 'Seated Cable Row',            detail: 'Compound • Mid back density',      sets: '4×12',   rest: '90s'  },
+          { name: 'DB Shrug',                    detail: 'Isolation • Trap thickness',       sets: '4×15',   rest: '60s'  },
+          { name: 'Straight-Arm Pulldown',       detail: 'Isolation • Lat activation',       sets: '3×15',   rest: '60s'  },
+          { name: 'Barbell Curl',                detail: 'Compound • Bicep mass',            sets: '4×10',   rest: '75s'  },
+          { name: 'Hammer Curl',                 detail: 'Isolation • Brachialis & peak',    sets: '3×12',   rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Day 3 — Shoulders',
+        exercises: [
+          { name: 'Barbell Overhead Press',      detail: 'Compound • Shoulder strength',     sets: '5×5',    rest: '3 min' },
+          { name: 'DB Lateral Raise',            detail: 'Isolation • Side delt width',      sets: '5×15',   rest: '60s'  },
+          { name: 'Arnold Press (Seated)',        detail: 'Compound • All delt heads',        sets: '4×10',   rest: '90s'  },
+          { name: 'Cable Lateral Raise',         detail: 'Isolation • Constant tension',     sets: '4×15',   rest: '60s'  },
+          { name: 'Rear Delt Fly (Pec Deck)',    detail: 'Isolation • Posterior delt',       sets: '4×20',   rest: '60s'  },
+          { name: 'Face Pulls',                  detail: 'Isolation • Rear delt & cuff',     sets: '4×20',   rest: '60s'  },
+          { name: 'Upright Row',                 detail: 'Compound • Trap & delt tie-in',    sets: '3×12',   rest: '75s'  },
+          { name: 'Front Raise (Plate)',         detail: 'Isolation • Front delt',           sets: '3×12',   rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Day 4 — Arms',
+        exercises: [
+          { name: 'EZ-Bar Curl',                 detail: 'Compound • Bicep mass builder',    sets: '4×10',   rest: '90s'  },
+          { name: 'Close-Grip Bench Press',      detail: 'Compound • Tricep strength',       sets: '4×8',    rest: '90s'  },
+          { name: 'Incline DB Curl',             detail: 'Isolation • Long head stretch',    sets: '4×12',   rest: '75s'  },
+          { name: 'Tricep Dips (Weighted)',      detail: 'Compound • All three heads',       sets: '3×10',   rest: '90s'  },
+          { name: 'Cable Curl (High)',           detail: 'Isolation • Peak & squeeze',       sets: '3×15',   rest: '60s'  },
+          { name: 'Overhead Rope Ext.',          detail: 'Isolation • Long head stretch',    sets: '3×15',   rest: '60s'  },
+          { name: 'Concentration Curl',          detail: 'Isolation • Bicep peak',           sets: '3×12',   rest: '60s'  },
+          { name: 'Reverse Pushdown',            detail: 'Isolation • Lateral & forearm',    sets: '3×15',   rest: '45s'  },
+          { name: 'Reverse Curl',                detail: 'Isolation • Brachioradialis',      sets: '3×12',   rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Day 5 — Legs',
+        exercises: [
+          { name: 'Barbell Back Squat',          detail: 'King lift • Quad & glute mass',    sets: '5×5',    rest: '4 min' },
+          { name: 'Leg Press',                   detail: 'Compound • High volume',           sets: '4×15',   rest: '2 min' },
+          { name: 'Hack Squat',                  detail: 'Compound • Quad sweep',            sets: '4×12',   rest: '2 min' },
+          { name: 'Romanian Deadlift',           detail: 'Compound • Hamstring length',      sets: '4×10',   rest: '2 min' },
+          { name: 'Leg Curl (Lying)',            detail: 'Isolation • Short head ham',       sets: '4×12',   rest: '75s'  },
+          { name: 'Leg Extension',               detail: 'Isolation • Quad definition',      sets: '4×15',   rest: '60s'  },
+          { name: 'Hip Thrust',                  detail: 'Isolation • Glute activation',     sets: '4×15',   rest: '90s'  },
+          { name: 'Standing Calf Raise',         detail: 'Isolation • Gastrocnemius',        sets: '5×20',   rest: '45s'  },
+          { name: 'Seated Calf Raise',           detail: 'Isolation • Soleus',               sets: '4×20',   rest: '45s'  },
+        ]
+      },
+    ]
+  },
+
+  fullbody: {
+    label: '🔥 Full Body 3×/Week',
+    info: 'Mon · Wed · Fri — rotating sessions',
+    days: [
+      {
+        day: 'Full Body A — Strength',
+        exercises: [
+          { name: 'Barbell Back Squat',          detail: 'Compound • Primary leg driver',    sets: '5×5',    rest: '4 min' },
+          { name: 'Flat Barbell Bench Press',    detail: 'Compound • Primary push',          sets: '5×5',    rest: '3 min' },
+          { name: 'Weighted Pull-Ups',           detail: 'Compound • Primary pull',          sets: '5×5',    rest: '3 min' },
+          { name: 'Romanian Deadlift',           detail: 'Compound • Posterior chain',       sets: '3×8',    rest: '2 min' },
+          { name: 'Overhead Press',              detail: 'Compound • Vertical push',         sets: '3×8',    rest: '2 min' },
+          { name: 'Barbell Row',                 detail: 'Compound • Horizontal pull',       sets: '3×8',    rest: '2 min' },
+          { name: 'DB Lateral Raise',            detail: 'Isolation • Delt accessory',       sets: '3×15',   rest: '60s'  },
+          { name: 'Barbell Curl',                detail: 'Isolation • Bicep accessory',      sets: '3×10',   rest: '60s'  },
+          { name: 'Skull Crushers',              detail: 'Isolation • Tricep accessory',     sets: '3×10',   rest: '60s'  },
+          { name: 'Plank',                       detail: 'Core • Anti-extension',            sets: '3×60s',  rest: '60s'  },
+        ]
+      },
+      {
+        day: 'Full Body B — Hypertrophy',
+        exercises: [
+          { name: 'Leg Press',                   detail: 'Compound • Quad volume',           sets: '4×12',   rest: '2 min' },
+          { name: 'Incline DB Press',            detail: 'Compound • Chest accessory',       sets: '4×10',   rest: '90s'  },
+          { name: 'Lat Pulldown',                detail: 'Compound • Lat width',             sets: '4×12',   rest: '90s'  },
+          { name: 'Lying Leg Curl',              detail: 'Isolation • Hamstring',            sets: '4×12',   rest: '75s'  },
+          { name: 'Seated DB Shoulder Press',    detail: 'Compound • Delt hypertrophy',      sets: '4×10',   rest: '90s'  },
+          { name: 'Chest-Supported Row',         detail: 'Compound • Back thickness',        sets: '4×12',   rest: '90s'  },
+          { name: 'Hip Thrust',                  detail: 'Isolation • Glute peak',           sets: '4×15',   rest: '75s'  },
+          { name: 'Cable Chest Fly',             detail: 'Isolation • Pec stretch',          sets: '3×12',   rest: '60s'  },
+          { name: 'Face Pulls',                  detail: 'Isolation • Rear delt health',     sets: '3×20',   rest: '60s'  },
+          { name: 'Standing Calf Raise',         detail: 'Isolation • Gastroc',              sets: '4×20',   rest: '45s'  },
+        ]
+      },
+      {
+        day: 'Full Body C — Power',
+        exercises: [
+          { name: 'Deadlift',                    detail: 'King lift • Max force output',     sets: '5×3',    rest: '4 min' },
+          { name: 'Close-Grip Bench Press',      detail: 'Compound • Tricep power',          sets: '4×6',    rest: '3 min' },
+          { name: 'Weighted Chin-Ups',           detail: 'Compound • Bicep & lat power',     sets: '4×6',    rest: '3 min' },
+          { name: 'Front Squat',                 detail: 'Compound • Quad dominant',         sets: '3×6',    rest: '3 min' },
+          { name: 'Push Press',                  detail: 'Compound • Explosive overhead',    sets: '3×6',    rest: '2 min' },
+          { name: 'Pendlay Row',                 detail: 'Compound • Explosive pull',        sets: '3×6',    rest: '2 min' },
+          { name: 'Bulgarian Split Squat',       detail: 'Unilateral • Power & balance',     sets: '3×8 ea', rest: '90s'  },
+          { name: 'Cable Lateral Raise',         detail: 'Isolation • Delt finisher',        sets: '3×20',   rest: '45s'  },
+          { name: 'Hanging Leg Raise',           detail: 'Core • Compression strength',      sets: '3×12',   rest: '60s'  },
+          { name: 'Seated Calf Raise',           detail: 'Isolation • Soleus',               sets: '4×20',   rest: '45s'  },
+        ]
+      },
+    ]
+  },
+};
+
+const morningHabits = [
+  { text: 'Wake at 6AM — no snooze. Light signals your cortisol peak.', tag: '5 min', col: 'c' },
+  { text: '500ml water + sea salt + squeeze of lemon first thing.', tag: '2 min', col: 'c' },
+  { text: 'Cold shower — 2 min warm then 60s cold blast.', tag: '10 min', col: 'k' },
+  { text: 'Sunlight exposure for 10 minutes — no sunglasses yet.', tag: '10 min', col: 'c' },
+  { text: 'Tongkat Ali + Ashwagandha capsules for test support.', tag: 'Daily', col: 'p' },
+  { text: 'Facial massage with gua sha tool — follow lymph lines.', tag: '5 min', col: 'k' },
+  { text: 'Mewing session — proper tongue posture while reading.', tag: 'All day', col: 'p' },
+  { text: 'High-protein breakfast: 4 eggs + Greek yogurt + berries.', tag: '400 kcal', col: 'c' },
+  { text: 'SPF 50 moisturizer — UV damage is the #1 skin ager.', tag: 'Daily', col: 'k' },
+  { text: 'Breathing exercises — box breathing for stress cortisol.', tag: '5 min', col: 'p' },
+  { text: '10g creatine monohydrate in water — no loading phase.', tag: 'Daily', col: 'c' },
+  { text: 'Journaling — 3 wins from yesterday, 3 goals for today.', tag: '5 min', col: 'p' },
+];
+
+const gymHabits = [
+  { text: 'Pre-workout: black coffee 30 min before training.', tag: 'Pre', col: 'c' },
+  { text: 'Lift heavy — progressive overload every session minimum +1%.', tag: 'Core', col: 'k' },
+  { text: 'Track every set and weight in your notes app.', tag: 'Log it', col: 'p' },
+  { text: '30g whey isolate + 5g leucine immediately post-workout.', tag: 'Post', col: 'c' },
+  { text: 'Sauna 15 min post-lift — raises GH and clears cortisol.', tag: '15 min', col: 'k' },
+  { text: 'Daily step goal: 10,000 steps for NEAT calories.', tag: 'NEAT', col: 'p' },
+  { text: 'Train abs 3x/week: cable crunches, leg raises, planks.', tag: '3x/wk', col: 'c' },
+  { text: 'Eat 1g protein per lb bodyweight — every single day.', tag: 'Macro', col: 'k' },
+  { text: 'Stretch 10 min post-workout — hips, hamstrings, chest.', tag: '10 min', col: 'p' },
+  { text: 'Foam roll quads and IT band on leg days.', tag: 'Recovery', col: 'c' },
+];
+
+const nightHabits = [
+  { text: 'Blue light glasses on after 8PM — melatonin preservation.', tag: '8PM', col: 'p' },
+  { text: 'Tretinoin 0.05% on face — the gold standard anti-ager.', tag: 'Nightly', col: 'k' },
+  { text: 'ZMA (zinc + magnesium) 30 min before bed for deep sleep.', tag: 'Supplement', col: 'p' },
+  { text: 'Set room to 65-68°F — cold rooms maximize deep sleep.', tag: 'Sleep', col: 'c' },
+  { text: 'Silk pillowcase — reduces facial creasing and hair breakage.', tag: 'Daily', col: 'k' },
+  { text: 'Under-eye collagen patches while you wind down.', tag: '20 min', col: 'p' },
+  { text: 'Reading fiction for 20 min — lowers cortisol 68%.', tag: '20 min', col: 'c' },
+  { text: 'No food 3 hours before sleep — supports GH release.', tag: 'Protocol', col: 'k' },
+  { text: 'Face tape your jawline while sleeping for definition.', tag: 'Optional', col: 'p' },
+  { text: '10 min of journaling — review progress and gratitude.', tag: '10 min', col: 'c' },
+];
+
+const workoutTags = ['progressive overload', 'hypertrophy', 'mind-muscle', 'time under tension', '60-90s rest', 'full ROM', 'tempo 3-1-1'];
+const routineTags  = ['consistency > intensity', 'sleep is anabolic', 'track everything', 'hormonal health', 'minimize stress'];
+
+/* ═══════════════════════════════════
+   UTILITIES
+═══════════════════════════════════ */
+const rand  = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const randN = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const pick  = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0, n);
+
+let currentSplit = 'ppl';
+function selectSplit(el, split) {
+  document.querySelectorAll('.split-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  currentSplit = split;
+}
+
+/* ═══════════════════════════════════
+   PAGE 1: ANALYZER
+═══════════════════════════════════ */
+document.getElementById('file-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = document.getElementById('preview-img');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    document.querySelector('.upload-zone').style.display = 'none';
+    startScan();
+  };
+  reader.readAsDataURL(file);
+});
+
+function regenerateAnalyzer() {
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('scan-section').style.display = 'none';
+  document.getElementById('preview-img').style.display = 'none';
+  document.querySelector('.upload-zone').style.display = 'flex';
+  document.getElementById('file-input').value = '';
+}
+
+function startScan() {
+  const scanSec  = document.getElementById('scan-section');
+  const scanBar  = document.getElementById('scan-bar');
+  const scanStat = document.getElementById('scan-status');
+  const resultSec = document.getElementById('results-section');
+
+  scanSec.style.display = 'block';
+  resultSec.style.display = 'none';
+
+  let step = 0;
+  const total = scanSteps.length;
+
+  function nextStep() {
+    if (step >= total) {
+      setTimeout(() => {
+        scanSec.style.display = 'none';
+        showResults();
+      }, 400);
+      return;
+    }
+    const pct = Math.round(((step + 1) / total) * 100);
+    scanBar.style.width  = pct + '%';
+    scanStat.textContent = scanSteps[step];
+    step++;
+    setTimeout(nextStep, 320 + Math.random() * 280);
+  }
+  nextStep();
+}
+
+function showResults() {
+  const score = randN(62, 97);
+  const rIdx  = score >= 88 ? 0 : score >= 76 ? 1 : score >= 65 ? 2 : 3;
+  const r     = ratings[rIdx];
+
+  document.getElementById('score-num').textContent = score;
+  const tagEl = document.getElementById('rating-tag');
+  tagEl.textContent = r.label;
+  tagEl.className = 'rating-tag ' + r.cls;
+  document.getElementById('score-title').textContent = r.title;
+  document.getElementById('score-sub').textContent   = r.sub;
+
+  // ring
+  const fill = document.getElementById('ring-fill');
+  const circ = 2 * Math.PI * 35;
+  fill.style.strokeDasharray  = circ;
+  fill.style.strokeDashoffset = circ;
+  setTimeout(() => {
+    fill.style.strokeDashoffset = circ - (score / 100) * circ;
+  }, 100);
+
+  // traits
+  const tList = document.getElementById('trait-list');
+  tList.innerHTML = '';
+  traits.forEach((t, i) => {
+    const v = randN(55, 99);
+    const div = document.createElement('div');
+    div.className = 'trait-row';
+    div.innerHTML = `
+      <div class="trait-header">
+        <span class="trait-name">${t.name}</span>
+        <span class="trait-score">${v}/100</span>
+      </div>
+      <div class="trait-bar">
+        <div class="trait-fill ${t.col}" id="tf-${i}"></div>
+      </div>`;
+    tList.appendChild(div);
+    setTimeout(() => {
+      document.getElementById('tf-' + i).style.width = v + '%';
+    }, 150 + i * 120);
+  });
+
+  // routine
+  const routine = rand(looksmaxRoutines);
+  const rl = document.getElementById('looksmax-routine');
+  rl.innerHTML = routine.map((item, i) => `
+    <div class="habit-item" style="animation-delay:${i*0.07}s">
+      <div class="habit-dot c"></div>
+      <div class="habit-text">${item}</div>
+    </div>`).join('');
+
+  document.getElementById('results-section').style.display = 'block';
+}
+
+/* ═══════════════════════════════════
+   PAGE 2: WORKOUT GENERATOR
+═══════════════════════════════════ */
+function toggleAccordion(idx) {
+  const item = document.getElementById('acc-' + idx);
+  const body = document.getElementById('acc-body-' + idx);
+  const isOpen = item.classList.contains('open');
+
+  // Close all
+  document.querySelectorAll('.accordion-item').forEach((el, i) => {
+    el.classList.remove('open');
+    document.getElementById('acc-body-' + i).style.maxHeight = '0';
+  });
+
+  // Open clicked if it was closed
+  if (!isOpen) {
+    item.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+  }
+}
+
+function generateWorkout() {
+  const result = document.getElementById('workout-result');
+  const loader = document.getElementById('workout-loader');
+  result.style.display = 'block';
+  loader.classList.add('show');
+
+  setTimeout(() => {
+    loader.classList.remove('show');
+    const split = workoutData[currentSplit];
+
+    document.getElementById('workout-split-label').innerHTML =
+      `<span style="font-size:1.15rem;font-weight:800;">${split.label}</span>
+       <span style="display:block;font-size:0.68rem;font-family:var(--font-mono);color:var(--muted);margin-top:2px;">${split.info}</span>`;
+
+    const accordion = document.getElementById('workout-accordion');
+    accordion.innerHTML = '';
+
+    split.days.forEach((day, idx) => {
+      const exCount = day.exercises.length;
+      const totalSets = day.exercises.reduce((sum, ex) => {
+        const m = ex.sets.match(/(\d+)×/);
+        return sum + (m ? parseInt(m[1]) : 3);
+      }, 0);
+
+      const item = document.createElement('div');
+      item.className = 'accordion-item';
+      item.id = 'acc-' + idx;
+
+      const exercisesHTML = day.exercises.map((ex, i) => `
+        <div class="exercise-item" style="animation-delay:${i*0.04}s">
+          <div class="ex-num">${i + 1}</div>
+          <div class="ex-info">
+            <div class="ex-name">${ex.name}</div>
+            <div class="ex-detail">${ex.detail}</div>
+            <div class="ex-rest">⏱ Rest: ${ex.rest}</div>
+          </div>
+          <div class="ex-sets">${ex.sets}</div>
+        </div>`).join('');
+
+      item.innerHTML = `
+        <div class="accordion-header" onclick="toggleAccordion(${idx})">
+          <div class="accordion-day-badge">D${idx + 1}</div>
+          <div class="accordion-info">
+            <div class="accordion-day-name">${day.day}</div>
+            <div class="accordion-meta">${exCount} exercises · ${totalSets} total sets</div>
+          </div>
+          <div class="accordion-chevron">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </div>
+        <div class="accordion-body" id="acc-body-${idx}">
+          <div class="accordion-body-inner">${exercisesHTML}</div>
+        </div>`;
+
+      accordion.appendChild(item);
+    });
+
+    // Auto-open Day 1
+    const firstItem = document.getElementById('acc-0');
+    const firstBody = document.getElementById('acc-body-0');
+    firstItem.classList.add('open');
+    // Use setTimeout so DOM has rendered and scrollHeight is correct
+    setTimeout(() => { firstBody.style.maxHeight = firstBody.scrollHeight + 'px'; }, 50);
+
+    const tagsEl = document.getElementById('workout-tags');
+    tagsEl.innerHTML = pick(workoutTags, 4).map(t => `<span class="tag">${t}</span>`).join('');
+  }, 1200);
+}
+
+/* ═══════════════════════════════════
+   PAGE 3: ROUTINES GENERATOR
+═══════════════════════════════════ */
+function generateRoutine() {
+  const result = document.getElementById('routine-result');
+  const loader = document.getElementById('routine-loader');
+  result.style.display = 'block';
+  loader.classList.add('show');
+
+  setTimeout(() => {
+    loader.classList.remove('show');
+
+    function renderHabits(listId, pool, n) {
+      const el = document.getElementById(listId);
+      el.innerHTML = '';
+      pick(pool, n).forEach((h, i) => {
+        const li = document.createElement('li');
+        li.className = 'habit-item';
+        li.style.animationDelay = (i * 0.06) + 's';
+        li.innerHTML = `
+          <div class="habit-dot ${h.col}"></div>
+          <div class="habit-text">${h.text}</div>
+          <div class="habit-tag">${h.tag}</div>`;
+        el.appendChild(li);
+      });
+    }
+
+    renderHabits('morning-habits', morningHabits, 4);
+    renderHabits('gym-habits',     gymHabits,     3);
+    renderHabits('night-habits',   nightHabits,   4);
+
+    const tagsEl = document.getElementById('routine-tags');
+    tagsEl.innerHTML = pick(routineTags, 3).map(t => `<span class="tag">${t}</span>`).join('');
+  }, 1100);
+}
+</script>
+</body>
+</html>
